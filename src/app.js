@@ -1,17 +1,17 @@
+import "./controller";
+
 const socket = io();
 
 //stt api 
-
 const axios = require('axios').default;
 const { v4: uuidv4 } = require('uuid'); 
 
 //음성인식 api 불러오기
 const speechsdk = require('microsoft-cognitiveservices-speech-sdk');
 
+
 //버튼 객체참조
 const startbtn = document.querySelector("#startSpeech"); //pug 파일의 버튼 id와 같은걸로
-
-
 const myFace = document.querySelector("#myFace");
 const muteBtn = document.querySelector("#mute");
 const muteIcon = muteBtn.querySelector(".muteIcon");
@@ -20,7 +20,6 @@ const cameraBtn = document.querySelector("#camera");
 const cameraIcon = cameraBtn.querySelector(".cameraIcon");
 const unCameraIcon = cameraBtn.querySelector(".unCameraIcon");
 const camerasSelect = document.querySelector("#cameras");
-
 const call = document.querySelector("#call");
 const welcome = document.querySelector("#welcome");
 
@@ -163,15 +162,15 @@ async function startCapture() {
   }
 }
 
-// Welcome Form (choose room)
+// Welcome Form (choose room) =============================
 
-call.classList.add(HIDDEN_CN);
+// call.classList.add(HIDDEN_CN);
 // welcome.hidden = true;
 
 const welcomeForm = welcome.querySelector("form");
 
 async function initCall() {
-  welcome.hidden = true;
+  // welcome.hidden = true;
   call.classList.remove(HIDDEN_CN);
   await getMedia();
 }
@@ -196,7 +195,7 @@ async function handleWelcomeSubmit(event) {
 
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
-// Chat Form
+// Chat Form ==============================================
 
 const chatForm = document.querySelector("#chatForm");
 const chatBox = document.querySelector("#chatBox");
@@ -224,7 +223,7 @@ function writeChat(message, className = null) {
   chatBox.prepend(li);
 }
 
-// Leave Room
+// Leave Room ==========================================================
 
 const leaveBtn = document.querySelector("#leave");
 
@@ -274,7 +273,7 @@ function clearAllChat() {
 
 leaveBtn.addEventListener("click", leaveRoom);
 
-// Modal code
+// Modal code ==========================================================
 
 const modal = document.querySelector(".modal");
 const modalText = modal.querySelector(".modal__text");
@@ -300,7 +299,7 @@ function handleKeydown(event) {
   }
 }
 
-// Socket code
+// Socket code ==========================================================
 
 socket.on("reject_join", () => {
   // Paint modal
@@ -371,7 +370,7 @@ socket.on("leave_room", (leavedSocketId, nickname) => {
   sortStreams();
 });
 
-// RTC code
+// RTC code ==========================================================
 
 function createConnection(remoteSocketId, remoteNickname) {
   const myPeerConnection = new RTCPeerConnection({
@@ -445,7 +444,7 @@ function sortStreams() {
   streamArr.forEach((stream) => (stream.className = `people${peopleInRoom}`));
 }
 
-//음성인식 이벤트리스너 
+//음성인식 이벤트리스너 ==========================================================
 async function handleSpeechClick() {
 
   //음성인식 코드
@@ -499,12 +498,9 @@ async function handleSpeechClick() {
         writeChat(displayText);
         //마이크가 없거나 말을 안한경우
     }
-
-
-}); 
-
-
+  }); 
 }
 
-//버튼에 리스너 달기
 startbtn.addEventListener("click",handleSpeechClick);
+
+export default app;

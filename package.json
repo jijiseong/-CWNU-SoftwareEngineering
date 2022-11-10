@@ -18,6 +18,7 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
+    "babel-node": "^0.0.1-security",
     "express": "^4.17.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.20.0",
     "pug": "^3.0.2",

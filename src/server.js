@@ -1,35 +1,27 @@
 import express from "express";
 import SocketIO from "socket.io";
 import http from "http";
+import router from "./router";
+import "./controller";
 
 const PORT = process.env.PORT || 4000;
-
 const app = express();
 
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
-
 app.use("/public", express.static(process.cwd() + "/src/public"));
 
-app.get("/", (req, res) => {
-  res.render("home");
-});
-
-app.get("/*", (req, res) => {
-  res.redirect("/");
-});
+app.use('/', router)
 
 const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
-let roomObjArr = [];
-const MAXIMUM = 5;
-
 wsServer.on("connection", (socket) => {
+  let roomObjArr = [];
+  const MAXIMUM = 5;
   let myRoomName = null;
   let myNickname = null;
   
-
   socket.on("join_room", (roomName, nickname) => {
     myRoomName = roomName;
     myNickname = nickname;
@@ -118,5 +110,5 @@ wsServer.on("connection", (socket) => {
 });
 
 const handleListen = () =>
-  console.log(`✅ Listening on https://localhost:${PORT}`);
+  console.log(`✅ Listening on http://localhost:${PORT}`);
 httpServer.listen(PORT, handleListen);
