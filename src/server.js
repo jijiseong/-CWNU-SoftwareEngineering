@@ -1,22 +1,26 @@
-import express from "express";
-import SocketIO from "socket.io";
-import http from "http";
 import router from "./router";
-import "./controller";
+
 
 const PORT = process.env.PORT || 4000;
+
+const bodyParser = require('body-parser');
+const express = require('express');
+const http = require('http');
+const {Server} = require("socket.io");
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server)
+
 
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
 app.use("/public", express.static(process.cwd() + "/src/public"));
-
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json()); 
 app.use('/', router)
 
-const httpServer = http.createServer(app);
-const wsServer = SocketIO(httpServer);
-
-wsServer.on("connection", (socket) => {
+io.on("connection", (socket) => {
   let roomObjArr = [];
   const MAXIMUM = 5;
   let myRoomName = null;
@@ -109,6 +113,8 @@ wsServer.on("connection", (socket) => {
   });
 });
 
+
 const handleListen = () =>
   console.log(`✅ Listening on http://localhost:${PORT}`);
-httpServer.listen(PORT, handleListen);
+
+server.listen(PORT, handleListen);

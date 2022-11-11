@@ -22,9 +22,9 @@ html(lang="en")
                             h3#userNickname  
                     div#chatRoom
                         ul#chatBox
-                        form#chatForm
-                            input(required, type="text", placeholder="Write your chat")
-                            button Send
+                        form#chatForm(method="POST")
+                            input(required, name="chat", type="text", placeholder="Write your chat")
+                            input(type="submit", value="Send")
                     div#controlers2
                         div#controlers2__column
                             select#languages
@@ -59,4 +59,4 @@ html(lang="en")
 
     
         script(src="/socket.io/socket.io.js")
-        script(src="/public/js/bundle.js")
+        script var socket = io()

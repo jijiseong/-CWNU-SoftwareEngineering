@@ -1,5 +1,3 @@
-import "./controller";
-
 const socket = io();
 
 //stt api 
@@ -164,14 +162,11 @@ async function startCapture() {
 
 // Welcome Form (choose room) =============================
 
-// call.classList.add(HIDDEN_CN);
-// welcome.hidden = true;
 
 const welcomeForm = welcome.querySelector("form");
 
 async function initCall() {
-  // welcome.hidden = true;
-  call.classList.remove(HIDDEN_CN);
+  console.log("test");
   await getMedia();
 }
 
@@ -197,6 +192,8 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 // Chat Form ==============================================
 
+/* //refactoring 하는 중..refactoring 하는 중..refactoring 하는 중..refactoring 하는 중..refactoring 하는 중..
+
 const chatForm = document.querySelector("#chatForm");
 const chatBox = document.querySelector("#chatBox");
 
@@ -204,6 +201,7 @@ const MYCHAT_CN = "myChat";
 const NOTICE_CN = "noticeChat";
 
 chatForm.addEventListener("submit", handleChatSubmit);
+*/
 
 function handleChatSubmit(event) {
   event.preventDefault();

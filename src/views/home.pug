@@ -19,7 +19,7 @@ html(lang="en")
                 form(action="/room" method="get")                    
                     input#roomName(type="text", name='roomName', required, placeholder="Room Name")
                     input#nickname(type="text", name='nickName', required, placeholder="Your Nickname")
-                    button#enterbtn Enter Room
+                    input#enterbtn(type="submit" name="enter", placeholder="Enter room")
                     //- div#mylogin(class ="g-signin2" data-onsuccess="onSignIn")  
                     button#authorize_button(onclick='handleAuthClick()') Sign In
                     button#signout_button(onclick='handleSignoutClick()') Sign Out
@@ -168,4 +168,3 @@ html(lang="en")
         script(src="/socket.io/socket.io.js")
         //- script(src="https://apis.google.com/js/platform.js" async defer)
         script().
-        script(src="/public/js/bundle.js")
