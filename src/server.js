@@ -1,31 +1,46 @@
-import router from "./router";
-
+import express from "express";
+import SocketIO from "socket.io";
+import http from "http";
+import bodyParser from "body-parser";
 
 const PORT = process.env.PORT || 4000;
 
-const bodyParser = require('body-parser');
-const express = require('express');
-const http = require('http');
-const {Server} = require("socket.io");
-
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server)
-
 
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
-app.use("/public", express.static(process.cwd() + "/src/public"));
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json()); 
-app.use('/', router)
 
-io.on("connection", (socket) => {
-  let roomObjArr = [];
-  const MAXIMUM = 5;
+app.use("/public", express.static(process.cwd() + "/src/public"));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+
+
+app.get("/", (req, res) => {
+  res.render("home");
+});
+
+app.get("/chat/:roomName/:nickName", (req, res) => {
+  res.render("home", { invite: "1", iroomName: req.params.roomName, inickName: req.params.nickName });
+})
+
+app.get("/*", (req, res) => {
+  res.redirect("/");
+});
+
+
+
+const httpServer = http.createServer(app);
+const wsServer = SocketIO(httpServer);
+
+let roomObjArr = [];
+const MAXIMUM = 5;
+
+wsServer.on("connection", (socket) => {
   let myRoomName = null;
   let myNickname = null;
-  
+
+
   socket.on("join_room", (roomName, nickname) => {
     myRoomName = roomName;
     myNickname = nickname;
@@ -113,8 +128,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
 const handleListen = () =>
-  console.log(`✅ Listening on http://localhost:${PORT}`);
-
-server.listen(PORT, handleListen);
+  console.log(`✅ Listening on https://localhost:${PORT}`);
+httpServer.listen(PORT, handleListen);

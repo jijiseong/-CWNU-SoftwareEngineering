@@ -22,11 +22,24 @@
   "dependencies": {
     "babel-node": "^0.0.1-security",
     "body-parser": "^1.20.1",
+    "browserify": "^17.0.0",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "microsoft-cognitiveservices-speech-sdk": "^1.20.0",
     "pug": "^3.0.2",
     "socket.io": "^4.3.2",
     "ws": "^8.2.3"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jijiseong/CWNU_SoftwareEngineering.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jijiseong/CWNU_SoftwareEngineering/issues"
+  },
+  "homepage": "https://github.com/jijiseong/CWNU_SoftwareEngineering#readme"
 }
