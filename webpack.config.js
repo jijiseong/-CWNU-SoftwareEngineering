@@ -1,9 +1,17 @@
 const path = require("path");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     entry: './src/public/js/app.js',
     mode: "development",
     watch: true,
+    plugins: [
+        new NodePolyfillPlugin(),
+        new MiniCssExtractPlugin({
+            filename: "css/style.css",
+        })
+    ],
     output: {
         path: path.resolve(__dirname, "assets"),
         filename: 'js/bundle.js',
@@ -22,6 +30,10 @@ module.exports = {
                     }
                 }
             },
+            {
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
+            }
         ]
     }
 };

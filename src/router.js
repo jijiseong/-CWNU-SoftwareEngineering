@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { getHome, getInvite } from "./controller";
+import { postHome, getHome, getChat } from "./controller";
 
 const globalRouter = Router();
 
 globalRouter.get("/", getHome);
-globalRouter.get("/chat/:roomName/:nickName", getInvite);
+globalRouter.post("/", postHome);
+globalRouter.get("/chat/:roomName/:nickName", getChat);
 
 
 export default globalRouter;

@@ -1,4 +1,7 @@
 {
-  "ignore": "./src/public/*",
+  "ignore": [
+    "./src/public/*",
+    "/assets"
+  ],
   "exec": "babel-node src/server.js"
 }

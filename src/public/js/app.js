@@ -1,4 +1,12 @@
+import "../css/style.css"
+
 const socket = io();
+const axios = require('axios').default;
+
+const roomName = document.getElementById("roomName").innerText;
+const nickName = document.getElementById("nickName").innerText;
+
+socket.emit("join_room", roomName, nickName);
 
 //stt api 
 const { v4: uuidv4 } = require('uuid');
@@ -9,7 +17,6 @@ const speechsdk = require('microsoft-cognitiveservices-speech-sdk');
 //버튼 객체참조
 const startbtn = document.querySelector("#startSpeech"); //pug 파일의 버튼 id와 같은걸로
 
-
 const myFace = document.querySelector("#myFace");
 const muteBtn = document.querySelector("#mute");
 const muteIcon = muteBtn.querySelector(".muteIcon");
@@ -18,51 +25,21 @@ const cameraBtn = document.querySelector("#camera");
 const cameraIcon = cameraBtn.querySelector(".cameraIcon");
 const unCameraIcon = cameraBtn.querySelector(".unCameraIcon");
 const camerasSelect = document.querySelector("#cameras");
-
 const call = document.querySelector("#call");
-const welcome = document.querySelector("#welcome");
 
 const HIDDEN_CN = "hidden";
-call.classList.add(HIDDEN_CN);
+
 
 let myStream;
 let muted = true;
 unMuteIcon.classList.add(HIDDEN_CN);
 let cameraOff = false;
 unCameraIcon.classList.add(HIDDEN_CN);
-let roomName = "";
-let nickname = "";
 let peopleInRoom = 1;
-
-// 초대 링크로 들어온 경우
-if (invite === "1") {
-  socket.emit("join_room", iroomName, inickName);
-}
 
 let pcObj = {
   // remoteSocketId: pc
 };
-
-async function getCameras() {
-  try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const cameras = devices.filter((device) => device.kind === "videoinput");
-    const currentCamera = myStream.getVideoTracks();
-    cameras.forEach((camera) => {
-      const option = document.createElement("option");
-      option.value = camera.deviceId;
-      option.innerText = camera.label;
-
-      if (currentCamera.label == camera.label) {
-        option.selected = true;
-      }
-
-      camerasSelect.appendChild(option);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 async function getMedia(deviceId) {
   const initialConstraints = {
@@ -95,6 +72,28 @@ async function getMedia(deviceId) {
     console.log(error);
   }
 }
+async function getCameras() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices.filter((device) => device.kind === "videoinput");
+    const currentCamera = myStream.getVideoTracks();
+    cameras.forEach((camera) => {
+      const option = document.createElement("option");
+      option.value = camera.deviceId;
+      option.innerText = camera.label;
+
+      if (currentCamera.label == camera.label) {
+        option.selected = true;
+      }
+
+      camerasSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 
 function handleMuteClick() {
   myStream //
@@ -169,37 +168,32 @@ async function startCapture() {
 
 // Welcome Form (choose room)
 
-call.classList.add(HIDDEN_CN);
 // welcome.hidden = true;
 
-const welcomeForm = welcome.querySelector("form");
-console.log(welcomeForm.querySelector("#roomName"));
 
 async function initCall() {
-  welcome.hidden = true;
   call.classList.remove(HIDDEN_CN);
   await getMedia();
 }
 
-async function handleWelcomeSubmit(event) {
-  event.preventDefault();
+// async function handleWelcomeSubmit(event) {
+//   event.preventDefault();
 
-  if (socket.disconnected) {
-    socket.connect();
-  }
+//   if (socket.disconnected) {
+//     socket.connect();
+//   }
 
-  const welcomeRoomName = welcomeForm.querySelector("#roomName");
-  const welcomeNickname = welcomeForm.querySelector("#nickname");
-  const nicknameContainer = document.querySelector("#userNickname");
-  roomName = welcomeRoomName.value;
-  welcomeRoomName.value = "";
-  nickname = welcomeNickname.value;
-  welcomeNickname.value = "";
-  nicknameContainer.innerText = nickname;
-  socket.emit("join_room", roomName, nickname);
-}
+//   const welcomeRoomName = welcomeForm.querySelector("#roomName");
+//   const welcomeNickname = welcomeForm.querySelector("#nickname");
+//   const nicknameContainer = document.querySelector("#userNickname");
+//   roomName = welcomeRoomName.value;
+//   welcomeRoomName.value = "";
+//   nickname = welcomeNickname.value;
+//   welcomeNickname.value = "";
+//   nicknameContainer.innerText = nickname;
+//   socket.emit("join_room", roomName, nickname);
+// }
 
-welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
 // Chat Form
 
@@ -216,7 +210,7 @@ function handleChatSubmit(event) {
   const chatInput = chatForm.querySelector("input");
   const message = chatInput.value;
   chatInput.value = "";
-  socket.emit("chat", `${nickname}: ${message}`, roomName);
+  socket.emit("chat", `${nickName}: ${message}`, roomName);
   writeChat(`You: ${message}`, MYCHAT_CN);
 }
 
@@ -237,7 +231,7 @@ function leaveRoom() {
   socket.disconnect();
 
   call.classList.add(HIDDEN_CN);
-  welcome.hidden = false;
+
 
   peerConnectionObjArr = [];
   peopleInRoom = 1;
@@ -280,7 +274,7 @@ function clearAllChat() {
 leaveBtn.addEventListener("click", leaveRoom);
 
 // Modal code
-
+/*
 const modal = document.querySelector(".modal");
 const modalText = modal.querySelector(".modal__text");
 const modalBtn = modal.querySelector(".modal__btn");
@@ -304,7 +298,7 @@ function handleKeydown(event) {
     removeModal();
   }
 }
-
+*/
 // Socket code
 
 socket.on("reject_join", () => {
@@ -459,7 +453,6 @@ async function handleSpeechClick() {
 
   const audioConfig = speechsdk.AudioConfig.fromDefaultMicrophoneInput();
 
-
   const recognizer = new speechsdk.SpeechRecognizer(speechConfig, audioConfig);
 
   recognizer.recognizeOnceAsync(result => {
@@ -489,9 +482,10 @@ async function handleSpeechClick() {
           'text': displayText
         }],
         responseType: 'json'
+
       }).then(function (response) {
 
-
+        console.log("test");
         writeChat(JSON.stringify(response.data, null, 4));
         console.log(JSON.stringify(response.data, null, 4));
         //아직 json 타입
@@ -504,11 +498,7 @@ async function handleSpeechClick() {
       writeChat(displayText);
       //마이크가 없거나 말을 안한경우
     }
-
-
   });
-
-
 }
 
 //버튼에 리스너 달기

@@ -4,14 +4,18 @@ import http from "http";
 import "./db";
 import session from "express-session";
 import globalRouter from "./router";
-import fileStore from "session-file-store";
 
+const fileStore = require('session-file-store')(session);
+const PORT = 3000;
 const app = express();
 const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
-const fileStore = fileStore(session);
 
 // middle wares
+
+app.set("view engine", "pug");
+app.set("views", __dirname + "/views");
+app.use("/public", express.static("assets"));
 app.use(express.urlencoded({ extended: false }));
 app.use(
   session({
@@ -21,7 +25,6 @@ app.use(
     store: new fileStore()
   })
 );
-
 app.use("/", globalRouter);
 
 wsServer.on("connection", (socket) => {
@@ -123,5 +126,5 @@ wsServer.on("connection", (socket) => {
 });
 
 const handleListen = () =>
-  console.log(`✅ Listening on https://localhost:${PORT}`);
+  console.log(`✅ Listening on http://localhost:${PORT}`);
 httpServer.listen(PORT, handleListen);

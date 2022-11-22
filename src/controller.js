@@ -7,14 +7,23 @@ export const finishGoogleLogin = (req, res) => {
 };
 
 
+export const postHome = (req, res) => {
+    const { roomName, nickName } = req.body;
+
+    return res.redirect(`chat/${roomName}/${nickName}`);
+};
+
 export const getHome = (req, res) => {
     return res.render("home");
-}
+};
 
-export const getInvite = (req, res) => {
+export const getChat = (req, res) => {
     const {
         params: { roomName, nickName }
     } = req;
 
-    return res.render("home", { invite: "1", iroomName: roomName, inickName: nickName });
-}
+    res.locals.roomName = roomName;
+    res.locals.nickName = nickName;
+
+    return res.render("chatroom");
+};
