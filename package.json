@@ -7,26 +7,27 @@
   "license": "CWNU_NetWork_Lab",
   "scripts": {
     "start": "node build/server.js",
-    "build": "babel src -d build --ignore src/public",
+    "build": "webpack",
     "dev": "nodemon"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.8",
-    "@babel/core": "^7.16.12",
-    "@babel/node": "^7.16.0",
-    "@babel/preset-env": "^7.16.0",
     "nodemon": "^2.0.15",
+    "babel-loader": "^9.1.0",
     "webpack": "^5.75.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^5.0.0"
   },
   "dependencies": {
-    "babel-node": "^0.0.1-security",
-    "body-parser": "^1.20.1",
-    "browserify": "^17.0.0",
+    "@babel/core": "^7.13.14",
+    "@babel/node": "^7.13.13",
+    "@babel/preset-env": "^7.13.12",
     "express": "^4.17.1",
+    "express-session": "^1.17.3",
     "lodash": "^4.17.21",
     "microsoft-cognitiveservices-speech-sdk": "^1.20.0",
+    "passport": "^0.6.0",
+    "passport-google-oauth": "^2.0.0",
     "pug": "^3.0.2",
+    "session-file-store": "^1.5.0",
     "socket.io": "^4.3.2",
     "ws": "^8.2.3"
   },

@@ -1,6 +1,5 @@
 const socket = io();
 
-
 //stt api 
 const { v4: uuidv4 } = require('uuid');
 

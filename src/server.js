@@ -1,42 +1,32 @@
 import express from "express";
 import SocketIO from "socket.io";
 import http from "http";
-import bodyParser from "body-parser";
-
-const PORT = process.env.PORT || 4000;
+import "./db";
+import session from "express-session";
+import globalRouter from "./router";
+import fileStore from "session-file-store";
 
 const app = express();
-
-app.set("view engine", "pug");
-app.set("views", process.cwd() + "/src/views");
-
-app.use("/public", express.static(process.cwd() + "/src/public"));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-
-
-app.get("/", (req, res) => {
-  res.render("home");
-});
-
-app.get("/chat/:roomName/:nickName", (req, res) => {
-  res.render("home", { invite: "1", iroomName: req.params.roomName, inickName: req.params.nickName });
-})
-
-app.get("/*", (req, res) => {
-  res.redirect("/");
-});
-
-
-
 const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
+const fileStore = fileStore(session);
 
-let roomObjArr = [];
-const MAXIMUM = 5;
+// middle wares
+app.use(express.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    store: new fileStore()
+  })
+);
+
+app.use("/", globalRouter);
 
 wsServer.on("connection", (socket) => {
+  const MAXIMUM = 5;
+  let roomObjArr = [];
   let myRoomName = null;
   let myNickname = null;
 
@@ -98,6 +88,10 @@ wsServer.on("connection", (socket) => {
 
   socket.on("chat", (message, roomName) => {
     socket.to(roomName).emit("chat", message);
+  });
+
+  socket.on("email", (message, user) => {
+    socket.to(user !== undefined ? `${user.email}` : `비회원`).emit("chat", message);
   });
 
   socket.on("disconnecting", () => {
