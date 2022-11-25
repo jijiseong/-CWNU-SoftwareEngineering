@@ -1,4 +1,4 @@
-@import './reset.css';
+@import "reset.css";
 
 :root {
   --black-color: #212121;
@@ -15,6 +15,10 @@
 
   --modal-box-color: #FFEFDC;
   --modal-btn-color: #FFEFDC;
+}
+
+#reservation {
+  background-color: #f85031;
 }
 
 * {
@@ -132,8 +136,8 @@ main {
 }
 
 #streamBox #streams {
-  width: 75%;
-  height: 75%;
+  width: 100%;
+  height: 100%;
 
   display: flex;
   justify-content: space-evenly;

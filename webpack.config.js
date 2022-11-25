@@ -1,5 +1,5 @@
 const path = require("path");
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
     mode: "development",
     watch: true,
     plugins: [
-        new NodePolyfillPlugin(),
+
         new MiniCssExtractPlugin({
             filename: "css/style.css",
         })
