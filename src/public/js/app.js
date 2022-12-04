@@ -1,9 +1,23 @@
 import "../css/style.css"
-import fetch from "cross-fetch";
 import axios from 'axios';
 const socket = io();
 
+//login 버튼 구현
 
+function handleloginclick() {
+  location.href = 'auth/google';
+}
+
+function handlelogoutclick() {
+  location.href = 'auth/logout';
+}
+
+function handledirectClick() {
+  document.querySelector("#roomName").value = iroomName;
+  document.querySelector("#nickname").value = inickName;
+  console.log("test", iroomName, inickName);
+  document.querySelector("#enterbtn").click();
+}
 
 //stt api 
 const { v4: uuidv4 } = require('uuid');
@@ -435,8 +449,8 @@ function sortStreams() {
 async function handleSpeechClick() {
 
   //음성인식 코드
-  const speechConfig = speechsdk.SpeechConfig.fromSubscription("6b56e306d60644f1b2563bc8dbf26cd1", "koreacentral");
-  speechConfig.speechRecognitionLanguage = 'ko-KR';
+  const speechConfig = speechsdk.SpeechConfig.fromSubscription("6b56e306d60644f1b2563bc8dbf26cd1", "koreacentral");  //번역 API 키값 유동적
+  speechConfig.speechRecognitionLanguage = speechLanguage;
 
   const audioConfig = speechsdk.AudioConfig.fromDefaultMicrophoneInput();
 
@@ -454,38 +468,61 @@ async function handleSpeechClick() {
       axios({
         baseURL: "https://api.cognitive.microsofttranslator.com",
         url: '/translate',
-        method: 'POST',
+        method: 'post',
         headers: {
-          'Ocp-Apim-Subscription-Key': "2a2f2653bf284b8fa7c33c656156823b",
+          'Ocp-Apim-Subscription-Key': "2a2f2653bf284b8fa7c33c656156823b",  //번역 API 키값 유동적
           'Ocp-Apim-Subscription-Region': "koreacentral",
           'Content-type': 'application/json',
           'X-ClientTraceId': uuidv4().toString()
         },
-
         params: {
           'api-version': '3.0',
-          'from': 'ko',
-          'to': ['en']
+          'from': translateFrom,
+          'to': [translateTo]
         },
         data: [{
           'text': displayText
         }],
         responseType: 'json'
       }).then(function (response) {
-        console.log(response.data);
 
-        writeChat(JSON.stringify(response.data, null, 4));
-        console.log(JSON.stringify(response.data, null, 4));
+
+
+        //writeChat(JSON.stringify(response.data, null, 4));
+        //const chatInput = chatForm.querySelector("input");
+        //chatInput.value = displayText;
+        let myText = JSON.stringify(response.data[0], null, 4);
+        let translated = JSON.parse(myText).translations;
+        //let result = translatedText[0];
+        //let finish = JSON.parse(result).text;
+
+        console.log(myText);
+        console.log(translated);
+
+        let translatedText = JSON.stringify(translated[0], null, 4);
+        let resultText = JSON.parse(translatedText).text;
+
+        console.log(translatedText);
+        console.log(resultText);
+        const chatInput = chatForm.querySelector("input");
+        chatInput.value = resultText;
+        //console.log(result);
+        //console.log(finish);
+
         //아직 json 타입
 
       })
 
     } else {
       displayText = 'ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.';
-      console.log(displayText);
+      writeChat(displayText);
+      displayText = '오류: 말을 하지 않으셨거나 인식할 수 없습니다. 마이크가 제대로 작동하는지 확인하십시오.';
       writeChat(displayText);
       //마이크가 없거나 말을 안한경우
     }
+
+
+
 
 
   });
@@ -493,12 +530,130 @@ async function handleSpeechClick() {
 
 }
 
+const languageSelectBtn = document.querySelector("#language");
+
+function handleLanguageChangeClick() {
+
+  if (speechLanguage == 'ko-KR') {
+    languageSelectBtn.innerText = "En→Ko";
+    speechLanguage = 'en-US';
+    translateFrom = 'en';
+    translateTo = 'ko';
+  } else {
+    languageSelectBtn.innerText = "Ko→En";
+    speechLanguage = 'ko-KR';
+    translateFrom = 'ko';
+    translateTo = 'en';
+  }
+
+}
+const languagesSelect = document.querySelector("#languages");
+
+languagesSelect.onchange = function onLanguageSelected() {
+
+
+  let myoption = languagesSelect.options[languagesSelect.selectedIndex].value;
+
+
+
+
+
+  switch (myoption) {
+    case "1": {
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      speechLanguage = 'ko-KR';
+      translateFrom = 'ko';
+      translateTo = 'en';
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      break;
+
+    }
+    case "2": {
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      speechLanguage = 'ko-KR';
+      translateFrom = 'ko';
+      translateTo = 'ko';
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      break;
+    }
+    case "3": {
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      speechLanguage = 'en-US';
+      translateFrom = 'en';
+      translateTo = 'ko';
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      break;
+    }
+    case "4": {
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      speechLanguage = 'en-US';
+      translateFrom = 'en';
+      translateTo = 'en';
+      console.log("speechLanguage = " + speechLanguage + " translateFrom = " + translateFrom + " translateTo = " + translateFrom);
+      break;
+    }
+  }
+
+}
+
+
 //버튼에 리스너 달기
 startbtn.addEventListener("click", handleSpeechClick);
 
-if (invite === "true") {
+if (invite === "true" && islogin === "true") {
+
   document.querySelector("#roomName").value = iroomName;
   document.querySelector("#nickname").value = inickName;
   console.log("test", iroomName, inickName);
   document.querySelector("#enterbtn").click();
+}
+
+// 로그인 화면 전환 구현
+if (islogin === "true") {
+  alert("islogin === true");
+  var loginbtn = document.querySelector("#loginbtn");
+  var logoutbtn = document.querySelector("#logoutbtn");
+  var roomnameinput = document.querySelector("#roomName");
+  var nicknameinput = document.querySelector("#nickname");
+  var enterbtn = document.querySelector("#enterbtn");
+  var invitetxt = document.querySelector("#invtxt");
+  loginbtn.style.visibility = 'hidden';
+  logoutbtn.style.visibility = 'visible';
+  roomnameinput.style.visibility = 'visible';
+  nicknameinput.style.visibility = 'visible';
+  enterbtn.style.visibility = 'visible';
+  // invitetxt.style.visibiity = 'hidden';
+  invitetxt.innerHTML = `${name} 님 환영합니다.`;
+  // document.querySelector("#nickname").value = name;
+  // document.querySelector("#nickname").disabled = true
+
+  if (invite === "true") {
+
+    alert("islogin === true&&invite == true");
+  }
+
+} else {
+  alert("islogin === false");
+  var loginbtn = document.querySelector("#loginbtn");
+  var logoutbtn = document.querySelector("#logoutbtn");
+  var roomnameinput = document.querySelector("#roomName");
+  var nicknameinput = document.querySelector("#nickname");
+  var enterbtn = document.querySelector("#enterbtn");
+  var invitetxt = document.querySelector("#invtxt");
+
+  loginbtn.style.visibility = 'visible';
+  logoutbtn.style.visibility = 'hidden';
+  roomnameinput.style.visibility = 'hidden';
+  nicknameinput.style.visibility = 'hidden';
+  enterbtn.style.visibility = 'hidden';
+  invitetxt.style.visibiity = 'hidden';
+  if (invite === "true") {
+    invitetxt.innerHTML = "회의에 입장하려면 로그인 후에 초대 링크에 다시접속해주세요.";
+    alert("islogin === false&&invite == true");
+  } else {
+    alert("islogin === false&&invite == false");
+    invitetxt.innerHTML = "";
+  }
+
+
 }

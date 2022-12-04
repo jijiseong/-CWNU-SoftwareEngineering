@@ -1,11 +1,27 @@
-h1 Reservation 
-body
-    form(method="post")
-        input(name="email1", type="email")
-        input(name="email2", type="email")
-        input(name="email3", type="email")
-        input(name="email4", type="email")
-        input(name="email5", type="email")
-        input(name="date", type="date")
-        input(name="time", type="time")
-        input(type="submit", value="Rervation")
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        link(rel="stylesheet", href="/public/css/style.css")
+        title Reservation
+    body 
+        header
+            h1 Reservation 
+        main 
+            div#reservationForm
+                form(method="post")
+                    div#emailInput
+                        input(placeholder="E-mail 1", name="email1", type="email")
+                        input(placeholder="E-mail 2", name="email2", type="email")
+                        input(placeholder="E-mail 3", name="email3", type="email")
+                        input(placeholder="E-mail 4", name="email4", type="email")
+                        input(placeholder="E-mail 5", name="email5", type="email")
+                    div#timeInput
+                        input(name="date", type="date")
+                        input(name="time", type="time")
+                    div#reservationBtn
+                        button Rervation
+
+    

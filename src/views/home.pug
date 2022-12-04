@@ -17,6 +17,11 @@ html(lang="en")
                     input#roomName(type="text", required, placeholder="Room Name")
                     input#nickname(type="text", required, placeholder="Your Nickname")
                     button#enterbtn Enter Room
+                    button#loginbtn(onclick="location.href = 'auth/google'") login
+                    button#logoutbtn(onclick="location.href = 'auth/logout'") logout
+                    h1#invtxt 회
+                    
+                    
             div#call(class="call")
                 div=roomName
                 div#streamBox
@@ -54,7 +59,7 @@ html(lang="en")
                                     i(class="fas fa-video fa-2x cameraIcon")
                                     i(class="fas fa-video-slash fa-2x unCameraIcon")
                             div#buttons
-                                button(value="Reservation", onclick='window.open("/reservation", "reservation", "width=500, height=400, left=-600, top=300");')#reservation Reservation
+                                button(value="Reservation", onclick='window.open("/reservation", "reservation", "width=500, height=700, left=-600, top=300");')#reservation Reservation
                             button#leave Leave
                     
         aside.modal.hidden
@@ -66,5 +71,8 @@ html(lang="en")
             invite = "#{invite}";
             iroomName = "#{iroomName}";
             inickName = "#{inickName}";
+            islogin = "#{islogin}";
+            email = "#{email}";
+            name = "#{name}"
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/bundle.js")
