@@ -1,6 +1,5 @@
 import "../css/style.css"
-import axios from 'axios';
-
+import fetch from "cross-fetch"
 const socket = io();
 const { v4: uuidv4 } = require('uuid');
 const speechsdk = require('microsoft-cognitiveservices-speech-sdk');
@@ -417,59 +416,51 @@ function sortStreams() {
 
 //음성인식 이벤트리스너 
 async function handleSpeechClick() {
+  let selectedLang = parseInt(document.querySelector("#languages").value)
+  let src;
+  let dst;
+  let speechSrc;
 
-  //음성인식 코드
+  switch (selectedLang) {
+    case 1:
+      src = "ko"
+      speechSrc = "ko-KR"
+      dst = "en"
+      break;
+    case 2:
+      src = "en"
+      speechSrc = "en-US"
+      dst = "ko"
+      break;
+  }
+
+  // 음성 인식 
   const speechConfig = speechsdk.SpeechConfig.fromSubscription("6b56e306d60644f1b2563bc8dbf26cd1", "koreacentral");
-  speechConfig.speechRecognitionLanguage = 'ko-KR';
+  speechConfig.speechRecognitionLanguage = speechSrc;
   const audioConfig = speechsdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new speechsdk.SpeechRecognizer(speechConfig, audioConfig);
 
-  recognizer.recognizeOnceAsync(result => {
+  recognizer.recognizeOnceAsync(async result => {
     let displayText;
-
     if (result.reason === speechsdk.ResultReason.RecognizedSpeech) {
       displayText = result.text
-      console.log(displayText);
       writeChat(displayText);
-      //번역 코드
-      axios({
-        baseURL: "https://api.cognitive.microsofttranslator.com",
-        url: '/translate',
-        method: 'POST',
-        headers: {
-          'Ocp-Apim-Subscription-Key': "2a2f2653bf284b8fa7c33c656156823b",
-          'Ocp-Apim-Subscription-Region': "koreacentral",
-          'Content-type': 'application/json',
-          'X-ClientTraceId': uuidv4().toString()
-        },
 
-        params: {
-          'api-version': '3.0',
-          'from': 'ko',
-          'to': ['en']
-        },
-        data: [{
-          'text': displayText
-        }],
-        responseType: 'json'
-      }).then(function (response) {
-        console.log(response.data);
-        writeChat(JSON.stringify(response.data, null, 4));
-        console.log(JSON.stringify(response.data, null, 4));
-        //아직 json 타입
-      })
+      // GET reqeust to '/translate' 
+      const res = await (await fetch(`/translate?str=${displayText}&src=${src}&dst=${dst}`)).json();
+      const { translatedText } = res.message.result;
+      chatForm.querySelector("input").value = translatedText;
+
     } else {
       displayText = 'ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.';
-      console.log(displayText);
       writeChat(displayText);
-      //마이크가 없거나 말을 안한경우
     }
   });
 }
 
-//버튼에 리스너 달기
 startbtn.addEventListener("click", handleSpeechClick);
 
+// 초대 받은 경우 
 if (invite === "true") {
   document.querySelector("#roomName").value = iroomName;
   document.querySelector("#nickname").value = inickName;

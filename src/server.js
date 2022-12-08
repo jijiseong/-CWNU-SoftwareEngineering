@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv'
+dotenv.config();
 import express from "express";
 import SocketIO from "socket.io";
 import http from "http";
@@ -6,7 +8,6 @@ import schedule from "node-schedule";
 import mailSender from "./mailSender";
 
 const PORT = process.env.PORT || 4000;
-
 const app = express();
 
 app.set("view engine", "pug");
@@ -14,6 +15,30 @@ app.set("views", process.cwd() + "/src/views");
 app.use(express.urlencoded({ extended: false }));
 app.use("/public", express.static("assets"));
 app.use(bodyParser.json());
+
+// papago API
+app.get('/translate', (req, res) => {
+  const { str, src, dst } = req.query;
+  const client_id = process.env.PAPAGO_CLIENT_ID
+  const client_secret = process.env.PAPAGO_CLIENT_SECRET
+
+  const api_url = 'https://openapi.naver.com/v1/papago/n2mt';
+  const request = require('request');
+  const options = {
+    url: api_url,
+    form: { 'source': src, 'target': dst, 'text': str },
+    headers: { 'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret }
+  };
+  request.post(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      res.writeHead(200, { 'Content-Type': 'text/json;charset=utf-8' });
+      res.end(body);
+    } else {
+      res.status(response.statusCode).end();
+      console.log('error = ' + response.statusCode);
+    }
+  });
+});
 
 // GET reservation 
 app.get("/reservation", (req, res) => {
