@@ -1,7 +1,6 @@
 import "../css/style.css"
 import fetch from "cross-fetch"
 const socket = io();
-const { v4: uuidv4 } = require('uuid');
 const speechsdk = require('microsoft-cognitiveservices-speech-sdk');
 
 //버튼 객체참조
@@ -25,6 +24,7 @@ let cameraOff = false;
 unCameraIcon.classList.add(HIDDEN_CN);
 let roomName = "";
 let nickname = "";
+let email = "";
 let peopleInRoom = 1;
 
 let pcObj = {
@@ -85,7 +85,7 @@ async function getMedia(deviceId) {
 }
 
 function handleMuteClick() {
-  myStream //
+  myStream
     .getAudioTracks()
     .forEach((track) => (track.enabled = !track.enabled));
   if (muted) {
@@ -100,7 +100,7 @@ function handleMuteClick() {
 }
 
 function handleCameraClick() {
-  myStream //
+  myStream
     .getVideoTracks()
     .forEach((track) => (track.enabled = !track.enabled));
   if (cameraOff) {
@@ -136,7 +136,7 @@ muteBtn.addEventListener("click", handleMuteClick);
 cameraBtn.addEventListener("click", handleCameraClick);
 camerasSelect.addEventListener("input", handleCameraChange);
 
-// Welcome Form (choose room)
+/*------------------  Welcome Form (choose room) -----------------*/
 call.classList.add(HIDDEN_CN);
 const welcomeForm = welcome.querySelector("form");
 
@@ -155,25 +155,33 @@ async function handleWelcomeSubmit(event) {
 
   const welcomeRoomName = welcomeForm.querySelector("#roomName");
   const welcomeNickname = welcomeForm.querySelector("#nickname");
+  const welcomeEmail = welcomeForm.querySelector("#userEmail");
   const nicknameContainer = document.querySelector("#userNickname");
+  const emailContainer = document.querySelector("#callUserEmail");
+
+
   roomName = welcomeRoomName.value;
-  welcomeRoomName.value = "";
   nickname = welcomeNickname.value;
+  email = welcomeEmail.innerText;
+  console.log(email);
+
+  welcomeRoomName.value = "";
   welcomeNickname.value = "";
+
   nicknameContainer.innerText = nickname;
-  socket.emit("join_room", roomName, nickname);
+  // emailContainer.innerText = email;
+
+  socket.emit("join_room", roomName, nickname, email);
 }
 
 welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 
-// Chat Form
+
+/*------------------  Chat Form -----------------*/
 const chatForm = document.querySelector("#chatForm");
 const chatBox = document.querySelector("#chatBox");
-
 const MYCHAT_CN = "myChat";
 const NOTICE_CN = "noticeChat";
-
-chatForm.addEventListener("submit", handleChatSubmit);
 
 function handleChatSubmit(event) {
   event.preventDefault();
@@ -193,8 +201,9 @@ function writeChat(message, className = null) {
   chatBox.prepend(li);
 }
 
-// Leave Room
+chatForm.addEventListener("submit", handleChatSubmit);
 
+/*---------------- Leave Room ---------------*/
 const leaveBtn = document.querySelector("#leave");
 
 function leaveRoom() {
@@ -243,8 +252,7 @@ function clearAllChat() {
 
 leaveBtn.addEventListener("click", leaveRoom);
 
-// Modal code
-
+/* --------------- Modal code ----------------------*/
 const modal = document.querySelector(".modal");
 const modalText = modal.querySelector(".modal__text");
 const modalBtn = modal.querySelector(".modal__btn");
@@ -269,7 +277,7 @@ function handleKeydown(event) {
   }
 }
 
-// Socket code
+/*------------------ Socket code --------------------*/
 
 socket.on("reject_join", () => {
   // Paint modal
@@ -283,6 +291,10 @@ socket.on("reject_join", () => {
 });
 
 socket.on("accept_join", async (userObjArr) => {
+  console.log(userObjArr);
+  console.log(userObjArr[0].nickname);
+  console.log(userObjArr[0].email);
+
   await initCall();
 
   const length = userObjArr.length;
@@ -295,11 +307,12 @@ socket.on("accept_join", async (userObjArr) => {
     try {
       const newPC = createConnection(
         userObjArr[i].socketId,
-        userObjArr[i].nickname
+        userObjArr[i].nickname,
+        userObjArr[i].email
       );
       const offer = await newPC.createOffer();
       await newPC.setLocalDescription(offer);
-      socket.emit("offer", offer, userObjArr[i].socketId, nickname);
+      socket.emit("offer", offer, userObjArr[i].socketId, nickname, email);
       writeChat(`__${userObjArr[i].nickname}__`, NOTICE_CN);
     } catch (err) {
       console.error(err);
@@ -308,9 +321,9 @@ socket.on("accept_join", async (userObjArr) => {
   writeChat("is in the room.", NOTICE_CN);
 });
 
-socket.on("offer", async (offer, remoteSocketId, remoteNickname) => {
+socket.on("offer", async (offer, remoteSocketId, remoteNickname, remoteEmail) => {
   try {
-    const newPC = createConnection(remoteSocketId, remoteNickname);
+    const newPC = createConnection(remoteSocketId, remoteNickname, remoteEmail);
     await newPC.setRemoteDescription(offer);
     const answer = await newPC.createAnswer();
     await newPC.setLocalDescription(answer);
@@ -340,9 +353,9 @@ socket.on("leave_room", (leavedSocketId, nickname) => {
   sortStreams();
 });
 
-// RTC code
+/*-------------------- RTC code ---------------------*/
 
-function createConnection(remoteSocketId, remoteNickname) {
+function createConnection(remoteSocketId, remoteNickname, remoteEmail) {
   const myPeerConnection = new RTCPeerConnection({
     iceServers: [
       {
@@ -360,7 +373,7 @@ function createConnection(remoteSocketId, remoteNickname) {
     handleIce(event, remoteSocketId);
   });
   myPeerConnection.addEventListener("addstream", (event) => {
-    handleAddStream(event, remoteSocketId, remoteNickname);
+    handleAddStream(event, remoteSocketId, remoteNickname, remoteEmail);
   });
   // myPeerConnection.addEventListener(
   //   "iceconnectionstatechange",
@@ -383,12 +396,12 @@ function handleIce(event, remoteSocketId) {
   }
 }
 
-function handleAddStream(event, remoteSocketId, remoteNickname) {
+function handleAddStream(event, remoteSocketId, remoteNickname, remoteEmail) {
   const peerStream = event.stream;
-  paintPeerFace(peerStream, remoteSocketId, remoteNickname);
+  paintPeerFace(peerStream, remoteSocketId, remoteNickname, remoteEmail);
 }
 
-function paintPeerFace(peerStream, id, remoteNickname) {
+function paintPeerFace(peerStream, id, remoteNickname, remoteEmail) {
   const streams = document.querySelector("#streams");
   const div = document.createElement("div");
   div.id = id;
@@ -401,9 +414,13 @@ function paintPeerFace(peerStream, id, remoteNickname) {
   const nicknameContainer = document.createElement("h3");
   nicknameContainer.id = "userNickname";
   nicknameContainer.innerText = remoteNickname;
+  const emailContainer = document.createElement("h3");
+  emailContainer.id = "callUserEmail";
+  emailContainer.innerText = remoteEmail;
 
   div.appendChild(video);
   div.appendChild(nicknameContainer);
+  div.appendChild(emailContainer);
   streams.appendChild(div);
   sortStreams();
 }
@@ -414,13 +431,14 @@ function sortStreams() {
   streamArr.forEach((stream) => (stream.className = `people${peopleInRoom}`));
 }
 
-//음성인식 이벤트리스너 
+/*--------------- 음성 인식  ---------------------*/
 async function handleSpeechClick() {
   let selectedLang = parseInt(document.querySelector("#languages").value)
   let src;
   let dst;
   let speechSrc;
 
+  // 사용자 선택 (ko -> en, en -> ko)
   switch (selectedLang) {
     case 1:
       src = "ko"
@@ -434,12 +452,13 @@ async function handleSpeechClick() {
       break;
   }
 
-  // 음성 인식 
+  // 음성인식 interface 설정
   const speechConfig = speechsdk.SpeechConfig.fromSubscription("6b56e306d60644f1b2563bc8dbf26cd1", "koreacentral");
   speechConfig.speechRecognitionLanguage = speechSrc;
   const audioConfig = speechsdk.AudioConfig.fromDefaultMicrophoneInput();
   const recognizer = new speechsdk.SpeechRecognizer(speechConfig, audioConfig);
 
+  // 음성 인식
   recognizer.recognizeOnceAsync(async result => {
     let displayText;
     if (result.reason === speechsdk.ResultReason.RecognizedSpeech) {
@@ -460,10 +479,9 @@ async function handleSpeechClick() {
 
 startbtn.addEventListener("click", handleSpeechClick);
 
-// 초대 받은 경우 
-if (invite === "true") {
+/*--------------------- 초대 받은 경우 ------------------*/
+if (invite === true) {
   document.querySelector("#roomName").value = iroomName;
   document.querySelector("#nickname").value = inickName;
-  console.log("test", iroomName, inickName);
   document.querySelector("#enterbtn").click();
 }

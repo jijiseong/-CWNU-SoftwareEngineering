@@ -17,6 +17,16 @@ html(lang="en")
                     input#roomName(type="text", required, placeholder="Room Name")
                     input#nickname(type="text", required, placeholder="Your Nickname")
                     button#enterbtn Enter Room
+
+                    if name==="비회원" 
+                        button#loginbtn(onclick="location.href = 'auth/google'") login 
+                    
+                    else
+                        button#logoutbtn(onclick="location.href = 'logout'") logout 
+                        br
+                        small#userName=name 
+                        small#userEmail=email
+                        
             div#call(class="call")
                 div=roomName
                 div#streamBox
@@ -24,6 +34,7 @@ html(lang="en")
                         div#myStream(class="people1")
                             video#myFace(autoplay, playsinline, width="500", height="400")
                             h3#userNickname
+                            h3#callUserEmail=email
                     div#chatRoom
                         ul#chatBox
                         form#chatForm

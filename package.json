@@ -33,7 +33,6 @@
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
-    "google-translate-api": "^2.3.0",
     "https-browserify": "^1.0.0",
     "localStorage": "^1.0.4",
     "microsoft-cognitiveservices-speech-sdk": "^1.20.0",
