@@ -45,8 +45,8 @@ const googleCredentials = {
     "client_id": "832440413694-15midan99opv19j7nrocr79dndcnplg8.apps.googleusercontent.com",
     "client_secret": "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",
     "redirect_uris": [
-      "http://localhost:4000/login/callback",
-      "http://localhost:4000/login/invited"
+      `${SERVER_URL}:${PORT}/login/callback`,
+      `${SERVER_URL}:${PORT}/login/invited`
     ]
   }
 }
@@ -201,7 +201,9 @@ app.post("/reservation", async (req, res) => {
 app.get("/chat", (req, res) => {
   const { iroomName, inickName } = req.query;
   const invite = true;
-  return res.render("home", { iroomName, inickName, invite });
+  const email = getEmail();
+  const name = getUserName();
+  return res.render("home", { iroomName, inickName, invite, email, name });
 });
 
 

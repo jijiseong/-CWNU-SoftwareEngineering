@@ -480,7 +480,7 @@ async function handleSpeechClick() {
 startbtn.addEventListener("click", handleSpeechClick);
 
 /*--------------------- 초대 받은 경우 ------------------*/
-if (invite === true) {
+if (invite === "true") {
   document.querySelector("#roomName").value = iroomName;
   document.querySelector("#nickname").value = inickName;
   document.querySelector("#enterbtn").click();
