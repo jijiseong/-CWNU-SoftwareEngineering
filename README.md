@@ -18,8 +18,8 @@ git clone https://github.com/jijiseong/CWNU_SoftwareEngineering.git
 #### .env 
 papago API 사용을 위한  Client ID, Client Secret 코드가 필요합니다.
 ```json
-    PAPAGO_CLIENT_ID={PAPAGO CLIENT ID}
-    PAPAGO_CLIENT_SECRET={PAPAGO CLIENT SECRET} 
+PAPAGO_CLIENT_ID={PAPAGO CLIENT ID}
+PAPAGO_CLIENT_SECRET={PAPAGO CLIENT SECRET} 
 ```
 
 #### senderInfo.json 
