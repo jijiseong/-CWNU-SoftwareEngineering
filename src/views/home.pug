@@ -15,19 +15,19 @@ html(lang="en")
             div#welcome 
                 form
                     input#roomName(type="text", required, placeholder="Room Name")
-                    input#nickname(type="text", required, placeholder="Your Nickname")
+                    input#nickname(type="text", placeholder="Your Nickname")
                     button#enterbtn Enter Room
-
+                
                     if name==="비회원" 
-                        button#loginbtn(onclick="location.href = 'auth/google'") login 
-                    
+                        button#loginbtn(type="button" onclick="location.href = 'auth/google'") login 
+                        
                     else
-                        button#logoutbtn(onclick="location.href = 'logout'") logout 
+                        button#logoutbtn(type="button" onclick="location.href = 'logout'") logout 
                         br
                         small#userName=name 
                         small#userEmail=email
                         
-            div#call(class="call")
+            div.hidden#call(class="call")
                 div=roomName
                 div#streamBox
                     div#streams

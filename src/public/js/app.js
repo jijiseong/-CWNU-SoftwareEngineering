@@ -35,7 +35,13 @@ async function getCameras() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const cameras = devices.filter((device) => device.kind === "videoinput");
-    const currentCamera = myStream.getVideoTracks();
+    let currentCamera;
+    try {
+      currentCamera = myStream.getVideoTracks();
+    } catch (error) {
+      console.log(error);
+    }
+
     cameras.forEach((camera) => {
       const option = document.createElement("option");
       option.value = camera.deviceId;
@@ -157,19 +163,21 @@ async function handleWelcomeSubmit(event) {
   const welcomeNickname = welcomeForm.querySelector("#nickname");
   const welcomeEmail = welcomeForm.querySelector("#userEmail");
   const nicknameContainer = document.querySelector("#userNickname");
-  const emailContainer = document.querySelector("#callUserEmail");
-
 
   roomName = welcomeRoomName.value;
   nickname = welcomeNickname.value;
-  email = welcomeEmail.innerText;
-  console.log(email);
+  if (welcomeEmail) {
+    email = welcomeEmail.innerText;
+  } else {
+    alert("로그인을 진행해 주세요.");
+    return;
+  }
+
 
   welcomeRoomName.value = "";
   welcomeNickname.value = "";
 
   nicknameContainer.innerText = nickname;
-  // emailContainer.innerText = email;
 
   socket.emit("join_room", roomName, nickname, email);
 }

@@ -11,7 +11,7 @@ const fileStore = require('session-file-store')(session);
 const passport = require('passport')
   , GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
-const SERVER_URL = "http://localhost";
+const SERVER_URL = "https://jijiseong-symmetrical-space-engine-qxpvgx96pw9c69gx-4000.preview.app.github.dev";
 const PORT = process.env.PORT || 4000;
 const app = express();
 
@@ -45,8 +45,8 @@ const googleCredentials = {
     "client_id": "832440413694-15midan99opv19j7nrocr79dndcnplg8.apps.googleusercontent.com",
     "client_secret": "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",
     "redirect_uris": [
-      `${SERVER_URL}:${PORT}/login/callback`,
-      `${SERVER_URL}:${PORT}/login/invited`
+      `${SERVER_URL}/login/callback`,
+      `${SERVER_URL}/login/invited`
     ]
   }
 }
@@ -98,7 +98,9 @@ app.get('/auth/google',
 app.get('/login/callback',
   passport.authenticate('google', { failureRedirect: '/auth/login' }),
   (req, res) => {
-
+    req.session.islogin = true;
+    req.session.email = getEmail(req.user);
+    req.session.userName = getUserName(req.user);
     return res.redirect('/');
   }
 );
@@ -188,7 +190,7 @@ app.post("/reservation", async (req, res) => {
         let emailParam = {
           toEmail: email,
           subject: "회의가 곧 시작 합니다.",
-          text: `${SERVER_URL}:${PORT}/chat?iroomName=test`
+          text: `${SERVER_URL}/chat?iroomName=${reserveDate.getTime()}`
         };
         mailSender.sendGmail(emailParam);
       });
@@ -201,8 +203,9 @@ app.post("/reservation", async (req, res) => {
 app.get("/chat", (req, res) => {
   const { iroomName, inickName } = req.query;
   const invite = true;
-  const email = getEmail();
-  const name = getUserName();
+  const email = getEmail(req.user);
+  const name = getUserName(req.user);
+
   return res.render("home", { iroomName, inickName, invite, email, name });
 });
 
@@ -308,5 +311,5 @@ wsServer.on("connection", (socket) => {
 });
 
 const handleListen = () =>
-  console.log(`✅ Listening on ${SERVER_URL}:${PORT}`);
+  console.log(`✅ Listening on ${SERVER_URL}`);
 httpServer.listen(PORT, handleListen);

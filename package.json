@@ -6,7 +6,7 @@
   "author": "CWNU_NetWork_Lab",
   "license": "CWNU_NetWork_Lab",
   "scripts": {
-    "start": "node build/server.js",
+    "start": "babel-node src/server.js",
     "build": "webpack",
     "dev": "nodemon"
   },
