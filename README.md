@@ -7,17 +7,21 @@ papago API를 이용하여 실시간 번역이 가능합니다.
 
 ## 1. Setting
 
-### git clone
+### 1.1 git clone
 ```bash
 git clone https://github.com/jijiseong/CWNU_SoftwareEngineering.git
 ```
+### 1.2 npm install
 
+```bash
+npm install
+```
 
-### file create
+### 1.3 Create Files
 
 #### .env 
 papago API 사용을 위한  Client ID, Client Secret 코드가 필요합니다.
-```json
+```
 PAPAGO_CLIENT_ID={PAPAGO CLIENT ID}
 PAPAGO_CLIENT_SECRET={PAPAGO CLIENT SECRET} 
 ```
@@ -46,7 +50,7 @@ const PORT = process.env.PORT || 4000;
 
 
 ## 2. Server Start
-### npm start
+### 2.1 npm start
 ```bash
 npm run start
 ```
